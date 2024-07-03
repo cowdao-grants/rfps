@@ -76,6 +76,12 @@ interface SubPoolFactory is Auth {
      */
     function canSolve(address subPoolSolver) external view returns (bool);
     /**
+     * View function for determining the sub-pool for a given solver
+     * @param solver The solver to retrieve the sub-pool for
+     * @return SubPool
+     */
+    function solverSubPool(address solver) external view returns (SubPool);
+    /**
      * View function for determining the backend URI for the sub-pool
      * @return string URI
      */
