@@ -36,15 +36,15 @@ interface Auth {
     /**
      * Allows `usr` to perform root-level functions
      */
-    function rely(address usr) external auth;
+    function addOwner(address usr) external auth;
     /**
      * Denies `usr` from being able to perform root-level functions
      */
-    function deny(address usr) external auth;
+    function removeOwner(address usr) external auth;
     /**
      * Determine if `usr` is able to perform root-level functions
      */
-    function wards(address usr) external view returns (bool);
+    function isOwner(address usr) external view returns (bool);
 }
 
 interface SubPool is Auth {
