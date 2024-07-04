@@ -65,16 +65,20 @@ interface SubPoolFactory is Auth {
 
     /**
      * View function for determining the minimum collateral required if using `token`
+     * If the token is not a valid collateral, this function reverts.
      * @param token The token to retrieve the collateral requirement for
      */
     function collateral(IERC20 token) external view returns (uint256);
     /**
-     * View function for determining if a given solver EOA has a correctly collateralized
-     * sub-pool and has not announced an exit.
-     * @param subPoolSolver The solver to check
-     * @return bool if the solver is allowed to solve
+     * Determine if an address has a collateralized sub-pool and has not announced an exit.
+     * While not enforced on-chain, an address for which this call returns `true` is a
+     * solver and is allowed to submit settlement on CoW Protocol through
+     * `SignedSettlement`.
+     * @param candidate The address to check
+     * @return bool if the address should be allowed to submit settlements through
+     * `SignedSettlement`
      */
-    function canSolve(address subPoolSolver) external view returns (bool);
+    function canSolve(address candidate) external view returns (bool);
     /**
      * View function for determining the sub-pool for a given solver
      * @param solver The solver to retrieve the sub-pool for
@@ -92,7 +96,8 @@ interface SubPoolFactory is Auth {
      * Deploy a `SubPool` deterministically based on `msg.sender`.
      * @notice The `msg.sender` SHOULD NOT be a contract.
      * @param token The nominated token to use for collateral
-     * @param amt How much collateral to add to the sub-pool (must be minimally collateralised)
+     * @param amt How much collateral to add to the sub-pool (the call will revert if
+     * this value is below the minimal collateral needed for `token`)
      * @param cowAmt Amount of COW to add as collateral
      * @param backendUri The URI to send the batches to the solver
      * @dev Emits an event `SubPoolCreated` when creating a sub-pool
@@ -102,7 +107,8 @@ interface SubPoolFactory is Auth {
     // --- cow dao bonding pool authed functions ---
 
     /**
-     * Set the delay for a sub-pool to exit
+     * Set the minimum delay before a solver can claim back the collateral from its
+     * sub-pool
      * @dev Emits an event when setting a delay
      * @param delay The delay in seconds
      */
@@ -118,9 +124,9 @@ interface SubPoolFactory is Auth {
      */
     function revokeCollateral(IERC20 token) external auth;
     /**
-     * Fine a sub-pool
+     * Fine a sub-pool and send the proceeds to the caller
      * @param pool Which sub-pool to fine
-     * @param tokens The tokens to fine (sending to `msg.sender`)
+     * @param tokens The tokens to fine
      * @param amts The amount of tokens to fine
      * @dev Emits an event `Fine` when fining a sub-pool
      */
@@ -152,7 +158,7 @@ interface SubPoolFactory is Auth {
     function setBackendUri(SubPool pool, string calldata newUri) external onlySubpoolAuth;
 }
 
-interface SignedSettlement is Auth {
+interface SignedSettlement {
     /**
      * Signed settlement function that is callable by `msg.sender` if `msg.sender` is in
      * receipt of a valid signature. The signer is a trusted entity and bears the responsibility
