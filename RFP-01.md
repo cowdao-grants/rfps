@@ -101,16 +101,25 @@ interface SubPoolFactory is Auth {
 
     // --- permissionless functions ---
     /**
-     * Deploy a `SubPool` deterministically based on `msg.sender`.
-     * @notice The `msg.sender` SHOULD NOT be a contract.
+     * Deploy a `SubPool` for a solver and fund it with the minimum required collateral.
+     * @notice Deposited collateral consists of `amt` of `token` and `cowAmt` of COW.
      * @param token The nominated token to use for collateral
      * @param amt How much collateral to add to the sub-pool (the call will revert if
      * this value is below the minimal collateral needed for `token`)
-     * @param cowAmt Amount of COW to add as collateral
+     * @param cowAmt Amount of COW to add as collateral (the call will revert if this
+     * value is below the minimal collateral needed for COW)
+     * @param solver The address of the solver to create a sub-pool for (the call will
+     * revert if the solver already has a sub-pool or is a contract).
      * @param backendUri The URI to send the batches to the solver
-     * @dev Emits an event `SubPoolCreated` when creating a sub-pool
+     * @dev Emits an event `SubPoolCreated` when creating a sub-pool.
      */
-    function create(IERC20 token, uint256 amt, uint256 cowAmt, string calldata backendUri) external;
+    function create(
+        IERC20 token,
+        uint256 amt,
+        uint256 cowAmt,
+        address solver,
+        string calldata backendUri
+    ) external;
 
     // --- cow dao bonding pool authed functions ---
 
