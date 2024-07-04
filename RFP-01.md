@@ -80,9 +80,11 @@ interface SubPoolFactory is Auth {
      */
     function canSolve(address candidate) external view returns (bool);
     /**
-     * View function for determining the sub-pool for a given solver
+     * View function for determining the sub-pool for a given solver.
+     * Reverts if the input address has no sub-pool to its name.
      * @param solver The solver to retrieve the sub-pool for
-     * @return SubPool
+     * @return The contract managing the collateral paid by this solver to be
+     * allowed to settle transactions on CoW Protocol
      */
     function solverSubPool(address solver) external view returns (SubPool);
     /**
