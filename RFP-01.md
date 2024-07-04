@@ -1,5 +1,9 @@
 # RFP-01: Settlement contract wrapper
 
+## Preamble
+
+Requests for proposals are not to be taken as prescriptive or exhaustive. The community is encouraged to submit proposals that build upon the ideas presented in this document. The scope of the project may change based on the proposal received. The primary intent of this document is to provide a starting point from which to achieve the goals outlined, and what is ultimately implemented may differ from the initial proposal.
+
 ## Background
 
 The CoW DAO has recently passed [CIP-44: Reduced bonding requirements](https://snapshot.org/#/cow.eth/proposal/0x1b6f1171633ec3d20c4370db37074aa1bd830486d4d0d6c26165915cc42d9412), which allows solvers to participate in the batch auction with reduced bonding requirements. The reduced bonding requirements are as follows:
@@ -30,6 +34,8 @@ The goal of this project is to implement a `SubPoolFactory` that allows solvers 
 - Open-source code repository
 
 ### Interface
+
+The interfaces below are a _starting point_ for the project and are not exhaustive / binding - they have not be audited or exhaustively tested / reasoned. The community is encouraged to submit proposals that build upon the ideas presented in this document.
 
 ```solidity
 interface Auth {
