@@ -174,16 +174,26 @@ interface SignedSettlement {
      *  
      * The signed data **MUST** include:
      * - `solver` - the address of the sub-bonded solver, i.e. `msg.sender`
-     * - Replay protection - an expiry based on some configurable method (e.g. block number)
+     * - `deadline` - the deadline by which the settlement must be executed (e.g. block number)
+     * - `tokens` - the traded tokens vector for the settlement
+     * - `clearingPrices` - the clearing prices vector for the settlement
+     * - `trades` - the trades vector for the settlement
+     * - `interactions` - the interactions vector for the settlement
      *
      * @notice This contract is a facade around the `GPv2Settlement` contract and has no
      *         on-chain state / binding to the concept of a sub-pool. It is merely a
      *         permissioned wrapper around the `settle` function.
      * @dev There must be **NO** use of `SLOAD` / `SSTORE` in the execution path.
+     * @param signedData The signed data to execute the settlement
+     * @param r The `r` component of the signature
+     * @param s The `s` component of the signature
+     * @param v The `v` component of the signature
      */
     function signedSettle(
         bytes calldata signedData,
-        bytes calldata unsignedData,
+        bytes32 r,
+        bytes32 s,
+        uint8 v,
     ) external onlySubPool;
 }
 ```
