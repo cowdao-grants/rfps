@@ -131,15 +131,12 @@ interface SubPoolFactory is Auth {
      */
     function setExitDelay(uint256 delay) external auth;
     /**
-     * Allow `token` to be used as collateral for the sub-pool.
-     * @dev Emits an event `AllowCollateral` when allowing/updating a token
+     * Allow `token` to be used as collateral for the sub-pool. Setting `min` to 0
+     * will be interpreted as the collateral being invalid.
+     * @dev This function can also be used to update the minimum collateral required
+     * @dev Emits an event `SetCollateral` when updating the collateral
      */
-    function allowCollateral(IERC20 token, uint256 min) external auth;
-    /**
-     * Revoke `token` as a collateral for sub-pools
-     * @dev Emits an event `RevokeCollateral` when revoking a token
-     */
-    function revokeCollateral(IERC20 token) external auth;
+    function setMinCollateral(IERC20 token, uint256 min) external auth;
     /**
      * Fine a sub-pool and send the proceeds to the caller
      * @param pool Which sub-pool to fine
