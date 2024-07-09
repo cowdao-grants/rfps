@@ -23,7 +23,7 @@ The objective is to develop an open-source tool that confirms the maximization o
 - **Transaction Identification:**
 
   - Determine the position `p` of the MEV Blocker transaction within a block.
-  - Track all bundles related to this transaction within the first 11 seconds of the block.
+  - Track all bundles related to this transaction that were broadcasted within the first 10 seconds of the block (configurable).
 
 - **Bundle Simulation and Sorting:**
 
