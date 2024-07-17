@@ -25,7 +25,7 @@ The goal of this project is to implement a `SubPoolFactory` that allows solvers 
 - Ultra gas efficient signed settlement function
 - No co-mingling of funds between solvers
 - Easily observable on-chain addresses for MEV Blocker rebates
-- Permissionless access to the batch auction with reduced bonding requirements
+- Easier access to the batch auction with reduced bonding requirements
 
 ### Deliverables
 
@@ -68,22 +68,18 @@ interface SubPool is Auth {
 
 interface SubPoolFactory is Auth {
     // --- view functions ---
-
     /**
-     * View function for determining the minimum collateral required if using `token`
-     * If the token is not a valid collateral, this function reverts.
-     * @param token The token to retrieve the collateral requirement for
-     */
-    function collateral(IERC20 token) external view returns (uint256);
-    /**
-     * Determine if an address has a collateralized sub-pool and has not announced an exit.
+     * Determine if a candidate:
+     * 1. Has a registered sub-pool; and
+     * 2. The sub-pool has not announced an exit; and
+     * 3. The sub-pool has no overdue bills
      * While not enforced on-chain, an address for which this call returns `true` is a
      * solver and is allowed to submit settlement on CoW Protocol through
      * `SignedSettlement`.
      * @param candidate The address to check
      * @return bool if the address should be allowed to submit settlements through
      * `SignedSettlement`
-     */
+     */     
     function canSolve(address candidate) external view returns (bool);
     /**
      * View function for determining the sub-pool for a given solver.
@@ -103,11 +99,12 @@ interface SubPoolFactory is Auth {
     /**
      * Deploy a `SubPool` for a solver and fund it with the minimum required collateral.
      * @notice Deposited collateral consists of `amt` of `token` and `cowAmt` of COW.
-     * @param token The nominated token to use for collateral
-     * @param amt How much collateral to add to the sub-pool (the call will revert if
-     * this value is below the minimal collateral needed for `token`)
+     * @param token The nominated yield bearing token to use for collateral
+     * @param amt How much collateral to add to the sub-pool (minimum amount should be
+     * confirmed off-chain before calling this function)
      * @param cowAmt Amount of COW to add as collateral (the call will revert if this
-     * value is below the minimal collateral needed for COW)
+     * value is below the minimal collateral needed for COW - acts as spam prevention
+     * and gate-keeps `canSolve`).
      * @param solver The address of the solver to create a sub-pool for (the call will
      * revert if the solver already has a sub-pool or is a contract).
      * @param backendUri The URI to send the batches to the solver
@@ -131,38 +128,48 @@ interface SubPoolFactory is Auth {
      */
     function setExitDelay(uint256 delay) external auth;
     /**
-     * Allow `token` to be used as collateral for the sub-pool. Setting `min` to 0
-     * will be interpreted as the collateral being invalid.
-     * @dev This function can also be used to update the minimum collateral required
-     * @dev Emits an event `SetCollateral` when updating the collateral
+     * Set the minimum collateral required for $COW
+     * @dev Emits an event when setting the minimum collateral
+     * @param cowAmt The minimum amount of COW required
      */
-    function setMinCollateral(IERC20 token, uint256 min) external auth;
+    function setMinCow(uint256 cowAmt) external auth;
     /**
-     * Fine a sub-pool and send the proceeds to the caller
-     * @param pool Which sub-pool to fine
-     * @param tokens The tokens to fine
-     * @param amts The amount of tokens to fine
-     * @dev Emits an event `Fine` when fining a sub-pool
+     * Bill a sub-pool and send the proceeds to the caller
+     * The `auth` is unable to bill the sub-pool if the sub-pool has announced an exit
+     * and the `delay` has elapsed.
+     * @param pool Which sub-pool to bill
+     * @param tokens The tokens to bill
+     * @param amts The amount of tokens to bill
+     * @param reason The reason for the bill (fine, etc)
+     * @dev Emits an event `Bill` when billing a sub-pool
      */
-    function fine(SubPool pool, IERC20[] calldata tokens, uint256[] calldata amts) external auth;
+    function bill(SubPool pool, IERC20[] calldata tokens, uint256[] calldata amts, string calldata reason) external auth;
 
     // --- SubPool authed functions ---
 
     /**
-     * Indicate a sub-pool's intent to quit the batch auction
+     * Indicate a sub-pool's intent to exit the batch auction
      * At this point the solver whose sub-pool it is is now removed from
      * the competition.
      * This then starts the `delay` timer until exit is allowed.
      * @param pool The sub-pool to announce an exit for
      * @dev Emits an event `AnnounceExit`
      */
-    function announceDestroy(SubPool pool) external onlySubpoolAuth;
+    function announceExit(SubPool pool) external onlySubpoolAuth;
     /**
      * Withdraw any remaining collateral / cow from the sub-pool.
      * Funds are sent to `msg.sender`.
-     * @dev Should emit an event `SubPoolDestroyed` on the factory
+     * @dev Will revert if the sub-pool has not announced the exit and/or the
+     * `delay` has not passed.
+     * @dev MUST emit an event `Exit` on the factory
+     * @dev This function can be called repeatedly so long as the sub-pool has
+     * announced an exit and the `delay` has passed. This allows for the
+     * withdrawal of any remaining collateral / cow (or that which was accidentally
+     * sent to the sub-pool).
+     * @param pool The sub-pool whose exit to finalize
+     * @param tokens The tokens to withdraw
      */
-    function finalizeExit(SubPool pool) external onlySubpoolAuth;
+    function exit(SubPool pool, IERC20[] calldata tokens) external onlySubpoolAuth;
     /**
      * Set the backend URI for the sub-pool
      * @param pool The sub-pool to set the URI for
