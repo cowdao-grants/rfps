@@ -18,7 +18,10 @@ The target deposit is:
 
 ## Goal
 
-The goal of this project is to implement a `SubPoolFactory` that allows solvers to participate in the batch auction with reduced bonding requirements. The `SubPoolFactory` will deploy a `SubPool` for each solver, which will be funded to at least the minimum required amount. The `SubPoolFactory` will also provide a wrapper around the `GPv2Settlement` contract that allows solvers to execute their solutions by providing a signature attesting to the solution and their parameters.
+The goals of this project are the following.
+
+1. Implement a `SubPoolFactory` that allows solvers to participate in the batch auction with reduced bonding requirements. The `SubPoolFactory` will deploy a `SubPool` for each solver, which can be funded with arbitrary tokens and amounts.
+2. Implement `SignedSettlement`, a wrapper around the `GPv2Settlement` contract that allows solvers to execute their solutions by providing a signature attesting to the solution and their parameters.
 
 ### Key Features
 
