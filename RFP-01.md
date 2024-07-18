@@ -139,6 +139,7 @@ interface SubPoolFactory is Auth {
      * and the `delay` has elapsed.
      * @param pool Which sub-pool to bill
      * @param tokens The tokens to bill
+     *        (token 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE is taken to be the native token)
      * @param amts The amount of tokens to bill
      * @param reason The reason for the bill (fine, etc)
      * @dev Emits an event `Bill` when billing a sub-pool
