@@ -79,7 +79,7 @@ interface SubPoolFactory is Auth {
      * @param candidate The address to check
      * @return bool if the address should be allowed to submit settlements through
      * `SignedSettlement`
-     */     
+     */
     function canSolve(address candidate) external view returns (bool);
     /**
      * View function for determining the sub-pool for a given solver.
@@ -99,7 +99,7 @@ interface SubPoolFactory is Auth {
     /**
      * Deploy a `SubPool` for a solver and fund it with the minimum required collateral.
      * @notice Deposited collateral consists of `amt` of `token` and `cowAmt` of COW.
-     * @param token The nominated yield bearing token to use for collateral
+     * @param token The nominated token to use for collateral
      * @param amt How much collateral to add to the sub-pool (minimum amount should be
      * confirmed off-chain before calling this function)
      * @param cowAmt Amount of COW to add as collateral (the call will revert if this
