@@ -25,10 +25,9 @@ The goals of this project are the following.
 
 ### Key Features
 
-- Ultra gas efficient signed settlement function
-- No co-mingling of funds between solvers
-- Easily observable on-chain addresses for MEV Blocker rebates
-- Easier access to the batch auction with reduced bonding requirements
+- The `SignedSettlement` wrapper gas overhead must be minimal. 
+- Solver funds must be only stored in `SubPool`s and not mingled together.
+- It must be easy to map solver addresses from and to `SubPool` addresses.  
 
 ### Deliverables
 
