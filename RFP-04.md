@@ -30,3 +30,7 @@ The goals of this project are the following:
 - Fully migrated E2E test suite using Foundry, with each test in its own well-documented PR against the `contracts` repository.
 - Updated CI/CD pipeline to include deterministic E2E tests.
 - Open-source code repository with the migrated E2E tests and CI/CD configurations.
+
+### Further References
+
+- The [CoW AMM repository](https://github.com/cowprotocol/cow-amm/tree/test-interface/test/fork) is an example of a CoW Protocol repository where forked end-to-end tests are implemented.
